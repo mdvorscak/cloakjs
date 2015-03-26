@@ -9,27 +9,39 @@
 (function(exportName){
     'use strict';
 
-    var self = {};
-    var state = {};
-    var cases = [];
-    function truth() { return true; }
+    function IllegalArgumentError(message) {
+        this.name = 'IllegalArgumentError';
+        this.message = message || '';
+    }
+    IllegalArgumentError.prototype = new Error();
+
+    //Checks to see if a parameters type is the expected type
+    //If it is not, throw an error
+    function parameterCheck(obj){
+        if(typeof obj.param !== obj.type){
+            var errorMsg = obj.errorMsg || 'Argument ' + obj.argName + ' must be a ' + obj.type;
+            throw new IllegalArgumentError(errorMsg);
+        }
+    }
+
+    function trueWrapper() { return true; }
 
     function cloak(object, method){
         var fn = object[method];
-        if(typeof fn !== 'function'){
-            state.cloakingAllowed = false;
-            throw new Error('Cannot cloak property: ' + method + ', it is not a function');
-        }
-        state.lastObj = object;
-        state.lastMethod = method;
-        state.cloakingAllowed = true;
+        parameterCheck({param: fn,
+                        type : 'function',
+                        errorMsg: 'Cannot cloak property: ' + method + ', it is not a function'
+                        });
+        var self  = {};
+        var state = {};
+        var cases = [];
+
         //the default condition is true if no other conditions are met
         // in case when is not called before cloakWith
-        state.lastWhenCondition = truth;
-        //TODO:Figure out default when no cloakWith is used
+        state.lastWhenCondition = trueWrapper;
+        //TODO:Figure out default when no cloakWith is used, throw an error (but how?)
 
-
-        state.lastObj[state.lastMethod] = function cloakWrapper(){
+        object[method] = function cloakWrapper(){
             var currentCase;
             for(var i = 0, len = cases.length; i < len; i++){
                 currentCase = cases[i];
@@ -39,24 +51,20 @@
             }
         };
 
+        self.cloakWith = function cloakWith(fn){
+            parameterCheck({param: fn, type: 'function', argName: 'fn'});
+            cases.push({condition: state.lastWhenCondition, replacementFn: fn });
+            return self;
+        };
+
+        self.when = function when(fn){
+            parameterCheck({param: fn, type: 'function', argName: 'fn'});
+            state.lastWhenCondition = fn;
+            return self;
+        };
+
         return self;
     }
-
-    self.cloakWith = function cloakWith(fn){
-        if(typeof fn !== 'function'){
-            throw new Error('argument fn must be a function');
-        }
-        if(state.cloakingAllowed){
-            cases.push({condition: state.lastWhenCondition, replacementFn: fn });
-        }
-    };
-
-    self.when = function when(fn){
-        if(typeof fn !== 'function'){
-            throw new Error('argument fn must be a function');
-        }
-        state.lastWhenCondition = fn;
-    };
 
     //namespace
     if (typeof module !== 'undefined' && module.exports) {
