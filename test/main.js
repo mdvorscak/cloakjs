@@ -49,7 +49,7 @@ describe('cloak.js suite', function(){
                spyOn(console, 'log');
            });
           it('should replace the currently cloaked function with the function provided', function(){
-              cloak(foo, 'setBar').withFunction(otherObj.otherFunction);
+              cloak(foo, 'setBar').cloakWith(otherObj.otherFunction);
               foo.setBar(5);
               expect(console.log).toHaveBeenCalledWith('I have been switched!');
           });
@@ -60,19 +60,50 @@ describe('cloak.js suite', function(){
            });
 
            it('should be passed the original arguments', function(){
-               cloak(foo, 'setBar').withFunction(otherObj.otherFunction);
+               cloak(foo, 'setBar').cloakWith(otherObj.otherFunction);
                foo.setBar(5);
                expect(otherValue).toBe(5);
+               expect(bar).not.toBe(5)
            });
        });
 
         describe('when', function(){
-            it('should allow the next with call to be applied when the condition passed is true', function(){
+            it('should allow the next cloakWith call to be applied when the condition passed is true', function(){
+                function testIfAlertIsNotSupported(){
+                    return true;
+                }
+                function logFn(){
+                    console.log('No alerts allowed');
+                }
+                cloak(window, 'alert').when(testIfAlertIsNotSupported).cloakWith(logFn);
+                spyOn(console, 'log');
 
+                alert('Hi');
+                expect(console.log).toHaveBeenCalledWith('No alerts allowed');
             });
 
             it('should not allow the next with call to be applied when the condition passed is false', function(){
+                function testIfLoggingIsUnpopular(){
+                    return false;
+                }
+                var foo = { betterLogger: function(){ alert('lol jk'); }};
+                cloak(console, 'log').when(testIfLoggingIsUnpopular).cloakWith(foo, 'betterLogger');
+                spyOn(console, 'log');
 
+                console.log('yolo');
+                expect(console.log).toHaveBeenCalled();
+            });
+
+            it('should be evaluated when the cloaked function is called', function(){
+                var testRunAt;
+                function deferredTest(){
+                    testRunAt = Date.now();
+                }
+
+                cloak(console, 'log').when(deferredTest).cloakWith(window, 'alert');
+                var timeBeforeTheTest = Date.now();
+                console.log('deference test');
+                expect(testRunAt).toBeGreaterThan(timeBeforeTheTest)
             });
         });
     });
