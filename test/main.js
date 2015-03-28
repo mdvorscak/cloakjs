@@ -195,6 +195,48 @@ describe('cloak.js suite', function () {
                 expect(log2).toBe('test');
             });
         });
+
+        describe('before', function(){
+            it('should throw an error when it is not given a function', function(){
+                expect(function(){
+                    cloak(console, 'log').before(5);
+                }).toThrow();
+            });
+
+            it('should run before any of the wrapped functions', function(){
+
+            });
+
+            it('should run before the real function if it was never wrapped', function(){
+
+            });
+        });
+
+        describe('after', function(){
+            it('should throw an error when it is not given a function', function(){
+                expect(function(){
+                    cloak(console, 'log').after(5);
+                }).toThrow();
+            });
+
+            it('should run after all of the wrapped functions', function(){
+
+            });
+
+            it('should run after the real function if it was never wrapped', function(){
+
+            });
+        });
+
+        describe('andCallOriginal', function(){
+            it('should call the original function when the previous "when" condition is satisfied', function(){
+
+            });
+
+            it('should call the original function when there is no previous "when" condition', function(){
+
+            });
+        });
     });
 
     describe('uncloak', function () {

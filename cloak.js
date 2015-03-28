@@ -5,7 +5,8 @@
 //var myCloak = cloak(window, 'alert').when(alertIsNotSupported).cloakWith(popupFn)
 //    .when(logShouldBeUsed).cloakWith(logFn)
 //    .before(runPreActions)
-//    .after(runPostActions);
+//    .after(runPostActions)
+//    .andCallOriginal();
 // later that day...
 //myCloak.uncloak()
 (function (exportName) {
@@ -84,6 +85,14 @@
             if (wrappedMethod) {
                 object[method] = wrappedMethod;
             }
+        };
+
+        self.before = function before(fn){
+            parameterCheck({param: fn, type: 'function', argName: 'fn'});
+        };
+
+        self.after = function after(fn){
+            parameterCheck({param: fn, type: 'function', argName: 'fn'});
         };
 
         return self;
