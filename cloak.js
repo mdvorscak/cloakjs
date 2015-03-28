@@ -2,70 +2,76 @@
  * Created by Mike Dvorscak on 3/23/15.
  */
 
-//cloak(window, 'alert').when(alertIsNotSupported).cloakWith(popupFn)
+//var myCloak = cloak(window, 'alert').when(alertIsNotSupported).cloakWith(popupFn)
 //    .when(logShouldBeUsed).cloakWith(logFn)
 //    .before(runPreActions)
-//    .after(runPostActions)
-(function(exportName){
+//    .after(runPostActions);
+// later that day...
+//myCloak.uncloak()
+(function (exportName) {
     'use strict';
 
     function IllegalArgumentError(message) {
         this.name = 'IllegalArgumentError';
         this.message = message || '';
     }
+
     IllegalArgumentError.prototype = new Error();
 
     //Checks to see if a parameters type is the expected type
     //If it is not, throw an error
-    function parameterCheck(obj){
-        if(typeof obj.param !== obj.type){
+    function parameterCheck(obj) {
+        if (typeof obj.param !== obj.type) {
             var errorMsg = obj.errorMsg || 'Argument ' + obj.argName + ' must be a ' + obj.type;
             throw new IllegalArgumentError(errorMsg);
         }
     }
 
+    //Simple wrapper functions
     function trueWrapper() { return true; }
+    function falseWrapper() { return false; }
 
-    function cloak(object, method){
+    function cloak(object, method) {
         var fn = object[method];
-        parameterCheck({param: fn,
-                        type : 'function',
-                        errorMsg: 'Cannot cloak property: ' + method + ', it is not a function'
-                        });
-        var self  = {};
+        parameterCheck({
+                           param   : fn,
+                           type    : 'function',
+                           errorMsg: 'Cannot cloak property: ' + method + ', it is not a function'
+                       });
+        //Private variables
+        var self = {};
         var state = {};
         var cases = [];
-        var methodWrapped = false;
-
+        var wrappedMethod;
         //the default condition is true if no other conditions are met
         // in case when is not called before cloakWith
         state.lastWhenCondition = trueWrapper;
-        //TODO:Figure out default when no cloakWith is used, throw an error (but how?)
 
-        function replaceMethodWithWrapper(){
-            object[method] = function cloakWrapper(){
+        function replaceMethodWithWrapper() {
+            object[method] = function cloakWrapper() {
+                //Store the original method for later
+                wrappedMethod = object[method].bind(this);
                 var currentCase;
-                for(var i = 0, len = cases.length; i < len; i++){
+                for (var i = 0, len = cases.length; i < len; i++) {
                     currentCase = cases[i];
-                    if(currentCase.condition()){
+                    if (currentCase.condition()) {
                         currentCase.replacementFn.apply(this, Array.prototype.slice.call(arguments));
                     }
                 }
             };
-            methodWrapped = true;
         }
 
-        self.cloakWith = function cloakWith(fn){
+        self.cloakWith = function cloakWith(fn) {
             parameterCheck({param: fn, type: 'function', argName: 'fn'});
-            cases.push({condition: state.lastWhenCondition, replacementFn: fn });
+            cases.push({condition: state.lastWhenCondition, replacementFn: fn});
             //Only wrap for real when we're given something valid to wrap with
-            if(!methodWrapped){
+            if (!wrappedMethod) {
                 replaceMethodWithWrapper();
             }
             return self;
         };
 
-        self.when = function when(fn){
+        self.when = function when(fn) {
             parameterCheck({param: fn, type: 'function', argName: 'fn'});
             state.lastWhenCondition = fn;
             return self;
@@ -73,6 +79,10 @@
 
         return self;
     }
+
+    //Static helpers
+    cloak.TRUE = trueWrapper;
+    cloak.FALSE = falseWrapper;
 
     //namespace
     if (typeof module !== 'undefined' && module.exports) {
