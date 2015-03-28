@@ -29,6 +29,7 @@
 
     //Simple wrapper functions
     function trueWrapper() { return true; }
+
     function falseWrapper() { return false; }
 
     function cloak(object, method) {
@@ -48,9 +49,11 @@
         state.lastWhenCondition = trueWrapper;
 
         function replaceMethodWithWrapper() {
+            //Store the original method for later
+            wrappedMethod = object[method];
             object[method] = function cloakWrapper() {
-                //Store the original method for later
-                wrappedMethod = object[method].bind(this);
+                //bind the original methods context
+                wrappedMethod = wrappedMethod.bind(this);
                 var currentCase;
                 for (var i = 0, len = cases.length; i < len; i++) {
                     currentCase = cases[i];
@@ -75,6 +78,12 @@
             parameterCheck({param: fn, type: 'function', argName: 'fn'});
             state.lastWhenCondition = fn;
             return self;
+        };
+
+        self.uncloak = function uncloak() {
+            if (wrappedMethod) {
+                object[method] = wrappedMethod;
+            }
         };
 
         return self;

@@ -166,8 +166,23 @@ describe('cloak.js suite', function () {
     });
 
     describe('uncloak', function () {
-        it('should return the function to it\'s original state', function () {
+        it('should not modify the function if it was never wrapped', function(){
+            spyOn(console, 'log').and.callThrough();
+            cloak(console, 'log').uncloak();
+            console.log('test');
+            expect(console.log).toHaveBeenCalledWith('test');
+        });
 
+        it('should return the function to it\'s original state', function () {
+            var bar;
+            var foo = {
+                setBar: function(val){
+                    bar = val;
+                }
+            };
+            cloak(foo, 'setBar').cloakWith(function(){}).uncloak();
+            foo.setBar(5);
+            expect(bar).toBe(5);
         });
     });
 });
