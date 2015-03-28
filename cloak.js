@@ -35,25 +35,33 @@
         var self  = {};
         var state = {};
         var cases = [];
+        var methodWrapped = false;
 
         //the default condition is true if no other conditions are met
         // in case when is not called before cloakWith
         state.lastWhenCondition = trueWrapper;
         //TODO:Figure out default when no cloakWith is used, throw an error (but how?)
 
-        object[method] = function cloakWrapper(){
-            var currentCase;
-            for(var i = 0, len = cases.length; i < len; i++){
-                currentCase = cases[i];
-                if(currentCase.condition()){
-                    currentCase.replacementFn.apply(this, Array.prototype.slice.call(arguments));
+        function replaceMethodWithWrapper(){
+            object[method] = function cloakWrapper(){
+                var currentCase;
+                for(var i = 0, len = cases.length; i < len; i++){
+                    currentCase = cases[i];
+                    if(currentCase.condition()){
+                        currentCase.replacementFn.apply(this, Array.prototype.slice.call(arguments));
+                    }
                 }
-            }
-        };
+            };
+            methodWrapped = true;
+        }
 
         self.cloakWith = function cloakWith(fn){
             parameterCheck({param: fn, type: 'function', argName: 'fn'});
             cases.push({condition: state.lastWhenCondition, replacementFn: fn });
+            //Only wrap for real when we're given something valid to wrap with
+            if(!methodWrapped){
+                replaceMethodWithWrapper();
+            }
             return self;
         };
 

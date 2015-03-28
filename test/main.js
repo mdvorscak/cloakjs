@@ -87,24 +87,31 @@ describe('cloak.js suite', function(){
                     return false;
                 }
                 var foo = { betterLogger: function(){ alert('lol jk'); }};
-                cloak(console, 'log').when(testIfLoggingIsUnpopular).cloakWith(foo, 'betterLogger');
+                cloak(console, 'log').when(testIfLoggingIsUnpopular).cloakWith(foo.betterLogger);
                 spyOn(console, 'log');
 
                 console.log('yolo');
                 expect(console.log).toHaveBeenCalled();
             });
 
-            it('should be evaluated when the cloaked function is called', function(){
+            it('should be evaluated when the cloaked function is called', function(done){
                 var testRunAt;
                 function deferredTest(){
                     testRunAt = Date.now();
                 }
 
-                cloak(console, 'log').when(deferredTest).cloakWith(window, 'alert');
+                cloak(console, 'log').when(deferredTest).cloakWith(window.alert);
                 var timeBeforeTheTest = Date.now();
-                console.log('deference test');
-                expect(testRunAt).toBeGreaterThan(timeBeforeTheTest)
+                setTimeout(function(){
+                    console.log('deference test');
+                    expect(testRunAt).toBeGreaterThan(timeBeforeTheTest);
+                    done();
+                }, 1000);
             });
+        });
+
+        describe('chaining', function(){
+
         });
     });
 
