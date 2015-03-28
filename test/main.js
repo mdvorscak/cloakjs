@@ -26,6 +26,33 @@ describe('cloak.js suite', function () {
                 cloak(test, 'num');
             }).toThrow();
         });
+
+        it('should be able to be called on a multiple methods(each independently cloaked)', function () {
+            var foo, bar;
+            var obj1 = {
+                setFoo   : function (val) {
+                    foo = val;
+                },
+                setFooToo: function (val) {
+                    foo = val + ' too';
+                }
+            };
+
+            var obj2 = {
+                setBar   : function (val) {
+                    bar = val;
+                },
+                setBarToo: function (val) {
+                    bar = val + ' too';
+                }
+            };
+            cloak(obj1, 'setFoo').cloakWith(obj1.setFooToo);
+            cloak(obj2, 'setBar').cloakWith(obj2.setBarToo);
+            obj1.setFoo(1);
+            obj2.setBar(2);
+            expect(foo).toBe('1 too');
+            expect(bar).toBe('2 too');
+        });
     });
 
     describe('static functions', function () {
@@ -76,10 +103,10 @@ describe('cloak.js suite', function () {
                 expect(bar).not.toBe(5)
             });
 
-            it('should throw an error when it is not passed a function', function(){
-               expect(function(){
-                   cloak(console, 'log').cloakWith(5);
-               }).toThrow();
+            it('should throw an error when it is not passed a function', function () {
+                expect(function () {
+                    cloak(console, 'log').cloakWith(5);
+                }).toThrow();
             });
         });
 
@@ -129,8 +156,8 @@ describe('cloak.js suite', function () {
                 }, 1000);
             });
 
-            it('should throw an error when it is not passed a function', function(){
-                expect(function(){
+            it('should throw an error when it is not passed a function', function () {
+                expect(function () {
                     cloak(console, 'log').when(5);
                 }).toThrow();
             });
@@ -139,9 +166,11 @@ describe('cloak.js suite', function () {
         describe('chaining', function () {
             it('should only use the last when if multiple whens are called in a row with now cloakWith calls between them', function () {
                 var myLogEndpoint;
-                function otherLog(val){
+
+                function otherLog(val) {
                     myLogEndpoint = val;
                 }
+
                 cloak(console, 'log').when(cloak.FALSE).when(cloak.TRUE)
                     .cloakWith(otherLog);
                 console.log('test');
@@ -150,12 +179,15 @@ describe('cloak.js suite', function () {
 
             it('should use both cloakWith functions when two when conditions are met', function () {
                 var log1, log2;
-                function otherLog1(val){
+
+                function otherLog1(val) {
                     log1 = val;
                 }
-                function otherLog2(val){
+
+                function otherLog2(val) {
                     log2 = val;
                 }
+
                 cloak(console, 'log').when(cloak.TRUE).cloakWith(otherLog1)
                     .when(cloak.TRUE).cloakWith(otherLog2);
                 console.log('test');
@@ -166,7 +198,7 @@ describe('cloak.js suite', function () {
     });
 
     describe('uncloak', function () {
-        it('should not modify the function if it was never wrapped', function(){
+        it('should not modify the function if it was never wrapped', function () {
             spyOn(console, 'log').and.callThrough();
             cloak(console, 'log').uncloak();
             console.log('test');
@@ -176,11 +208,11 @@ describe('cloak.js suite', function () {
         it('should return the function to it\'s original state', function () {
             var bar;
             var foo = {
-                setBar: function(val){
+                setBar: function (val) {
                     bar = val;
                 }
             };
-            cloak(foo, 'setBar').cloakWith(function(){}).uncloak();
+            cloak(foo, 'setBar').cloakWith(function () {}).uncloak();
             foo.setBar(5);
             expect(bar).toBe(5);
         });
