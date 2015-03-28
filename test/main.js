@@ -3,6 +3,7 @@
  */
 
 describe('cloak.js suite', function () {
+    var nop = function(){};
     describe('cloak', function () {
 
         it('should do nothing when called alone', function () {
@@ -196,44 +197,93 @@ describe('cloak.js suite', function () {
             });
         });
 
-        describe('before', function(){
-            it('should throw an error when it is not given a function', function(){
-                expect(function(){
+        describe('before', function () {
+            var foo, bar, baz;
+            beforeEach(function () {
+                foo = {
+                    setBar: function (val) {
+                        bar = val;
+                    },
+                    setBaz: function (val) {
+                        baz = val;
+                    }
+                };
+            });
+
+            it('should throw an error when it is not given a function', function () {
+                expect(function () {
                     cloak(console, 'log').before(5);
                 }).toThrow();
             });
 
-            it('should run before any of the wrapped functions', function(){
+            it('should also adhere to precondition checks of the "when" function', function () {
+                var preaction1Flag, preaction2Flag;
+                function preactions1(){
+                    preaction1Flag = true;
+                }
+                function preactions2(){
+                    preaction2Flag = true;
+                }
 
+                cloak(console, 'log').when(cloak.FALSE).before(preactions1).cloakWith(nop)
+                                     .when(cloak.TRUE).before(preactions2).cloakWith(nop);
+                console.log('hello');
+                expect(preaction1Flag).toBeUndefined();
+                expect(preaction2Flag).toBe(true);
             });
 
-            it('should run before the real function if it was never wrapped', function(){
+            it('should run before any of the wrapped functions', function () {
+                var test, test2;
 
+                function setTest() {
+                    test = baz + 5;
+                }
+
+                function setTest2() {
+                    test2 = baz + 7;
+                }
+
+                cloak(foo, 'setBar').before(function () {
+                    foo.setBaz(5);
+                }).cloakWith(setTest).cloakWith(setTest2);
+                foo.setBar(1);
+                expect(test).toBe(10);
+                expect(test2).toBe(12);
             });
         });
 
-        describe('after', function(){
-            it('should throw an error when it is not given a function', function(){
-                expect(function(){
+        describe('after', function () {
+            it('should throw an error when it is not given a function', function () {
+                expect(function () {
                     cloak(console, 'log').after(5);
                 }).toThrow();
             });
 
-            it('should run after all of the wrapped functions', function(){
+            it('should run after all of the wrapped functions', function () {
+                var bar, baz, ultimateAnswer;
+                function setBarTo5(){
+                    bar = 5;
+                }
+                function setBazTo37(){
+                    baz = 37;
+                }
+                function calculateUltimateAnswer() {
+                    ultimateAnswer = bar + baz;
+                }
 
-            });
-
-            it('should run after the real function if it was never wrapped', function(){
-
+                //After is in the first position to illustrate the fact that it will really come after the other functions
+                cloak(console, 'log').after(calculateUltimateAnswer).cloakWith(setBarTo5).cloakWith(setBazTo37);
+                console.log('Sup?');
+                expect(ultimateAnswer).toBe(42);
             });
         });
 
-        describe('andCallOriginal', function(){
-            it('should call the original function when the previous "when" condition is satisfied', function(){
+        describe('andCallOriginal', function () {
+            it('should call the original function when the previous "when" condition is satisfied', function () {
 
             });
 
-            it('should call the original function when there is no previous "when" condition', function(){
+            it('should call the original function when there is no previous "when" condition', function () {
 
             });
         });

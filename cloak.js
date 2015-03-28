@@ -44,10 +44,21 @@
         var self = {};
         var state = {};
         var cases = [];
+        var afterCases = [];
         var wrappedMethod;
         //the default condition is true if no other conditions are met
         // in case when is not called before cloakWith
         state.lastWhenCondition = trueWrapper;
+
+        function runCases(cases, context, args){
+            var currentCase;
+            for (var i = 0, len = cases.length; i < len; i++) {
+                currentCase = cases[i];
+                if (currentCase.condition()) {
+                    currentCase.replacementFn.apply(context, args);
+                }
+            }
+        }
 
         function replaceMethodWithWrapper() {
             //Store the original method for later
@@ -55,13 +66,9 @@
             object[method] = function cloakWrapper() {
                 //bind the original methods context
                 wrappedMethod = wrappedMethod.bind(this);
-                var currentCase;
-                for (var i = 0, len = cases.length; i < len; i++) {
-                    currentCase = cases[i];
-                    if (currentCase.condition()) {
-                        currentCase.replacementFn.apply(this, Array.prototype.slice.call(arguments));
-                    }
-                }
+                var args = Array.prototype.slice.call(arguments);
+                runCases(cases, this, args);
+                runCases(afterCases, this, args);
             };
         }
 
@@ -89,10 +96,14 @@
 
         self.before = function before(fn){
             parameterCheck({param: fn, type: 'function', argName: 'fn'});
+            cases.unshift({condition: state.lastWhenCondition, replacementFn: fn});
+            return self;
         };
 
         self.after = function after(fn){
             parameterCheck({param: fn, type: 'function', argName: 'fn'});
+            afterCases.push({condition: state.lastWhenCondition, replacementFn: fn});
+            return self;
         };
 
         return self;
