@@ -1,0 +1,23 @@
+{
+  "name": "cloak.js",
+  "version": "0.0.1",
+  "description": "An small AOP library with a fluent interface ",
+  "main": "cloak.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "AOP",
+    "wrapper"
+  ],
+  "author": "Mike Dvorscak",
+  "license": "MIT"
+}
