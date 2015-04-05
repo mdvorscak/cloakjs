@@ -22,24 +22,21 @@
     //Checks to see if a parameters type is the expected type
     //If it is not, throw an error
     function parameterCheck(obj) {
-        if (typeof obj.param !== obj.type) {
-            var errorMsg = obj.errorMsg || 'Argument ' + obj.argName + ' must be a ' + obj.type;
+        var paramType = typeof obj.param;
+        if (obj.types.indexOf(paramType) === -1) {
+            var errorMsg = obj.errorMsg ||
+                'Argument ' + obj.argName + ' must be one of the following types: ' + obj.types.join(', ');
             throw new IllegalArgumentError(errorMsg);
         }
     }
 
-    //Simple wrapper functions
-    function trueWrapper() { return true; }
-
-    function falseWrapper() { return false; }
-
     function cloak(object, method) {
         var fn = object[method];
         parameterCheck({
-                           param   : fn,
-                           type    : 'function',
-                           errorMsg: 'Cannot cloak property: ' + method + ', it is not a function'
-                       });
+            param   : fn,
+            types   : ['function'],
+            errorMsg: 'Cannot cloak property: ' + method + ', it is not a function'
+        });
         //Private variables
         var self = {};
         var state = {};
@@ -48,13 +45,14 @@
         var wrappedMethod;
         //the default condition is true if no other conditions are met
         // in case when is not called before cloakWith
-        state.lastWhenCondition = trueWrapper;
+        state.lastWhenCondition = true;
 
-        function runCases(cases, context, args){
-            var currentCase;
+        function runCases(cases, context, args) {
+            var currentCase, currentCondition;
             for (var i = 0, len = cases.length; i < len; i++) {
                 currentCase = cases[i];
-                if (currentCase.condition()) {
+                currentCondition= currentCase.condition;
+                if ((typeof currentCondition === 'function' && currentCondition()) || currentCondition) {
                     currentCase.replacementFn.apply(context, args);
                 }
             }
@@ -72,19 +70,31 @@
             };
         }
 
+        //Returns true if the case was added, false otherwise
+        //wrapper for adding to cases, so additional logic can easily be added
+        function addCase(opts, caseObj) {
+            if(caseObj.condition){
+                //Normally push, but if for cases like 'before' unshift is used
+                var addFn = opts.atStart ? 'unshift' : 'push';
+                Array.prototype[addFn].call(opts.caseArr, caseObj);
+            }
+            return caseObj.condition;
+        }
+
         self.cloakWith = function cloakWith(fn) {
-            parameterCheck({param: fn, type: 'function', argName: 'fn'});
-            cases.push({condition: state.lastWhenCondition, replacementFn: fn});
+            parameterCheck({param: fn, types: ['function'], argName: 'fn'});
+            var caseAdded = addCase({caseArr: cases},
+                                    {condition: state.lastWhenCondition, replacementFn: fn});
             //Only wrap for real when we're given something valid to wrap with
-            if (!wrappedMethod) {
+            if(caseAdded && !wrappedMethod){
                 replaceMethodWithWrapper();
             }
             return self;
         };
 
-        self.when = function when(fn) {
-            parameterCheck({param: fn, type: 'function', argName: 'fn'});
-            state.lastWhenCondition = fn;
+        self.when = function when(condition) {
+            parameterCheck({param: condition, types: ['function', 'boolean'], argName: 'condition'});
+            state.lastWhenCondition = condition;
             return self;
         };
 
@@ -94,24 +104,22 @@
             }
         };
 
-        self.before = function before(fn){
-            parameterCheck({param: fn, type: 'function', argName: 'fn'});
-            cases.unshift({condition: state.lastWhenCondition, replacementFn: fn});
+        self.before = function before(fn) {
+            parameterCheck({param: fn, types: ['function'], argName: 'fn'});
+            addCase({caseArr: cases, atStart: true},
+                    {condition: state.lastWhenCondition, replacementFn: fn});
             return self;
         };
 
-        self.after = function after(fn){
-            parameterCheck({param: fn, type: 'function', argName: 'fn'});
-            afterCases.push({condition: state.lastWhenCondition, replacementFn: fn});
+        self.after = function after(fn) {
+            parameterCheck({param: fn, types: ['function'], argName: 'fn'});
+            addCase({caseArr: afterCases},
+                    {condition: state.lastWhenCondition, replacementFn: fn});
             return self;
         };
 
         return self;
     }
-
-    //Static helpers
-    cloak.TRUE = trueWrapper;
-    cloak.FALSE = falseWrapper;
 
     //namespace
     if (typeof module !== 'undefined' && module.exports) {

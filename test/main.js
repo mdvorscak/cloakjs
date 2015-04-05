@@ -56,16 +56,6 @@ describe('cloak.js suite', function () {
         });
     });
 
-    describe('static functions', function () {
-        it('should have a shorthand wrapper function for true', function () {
-            expect(cloak.TRUE()).toBe(true);
-        });
-
-        it('should have a shorthand wrapper function for false', function () {
-            expect(cloak.FALSE()).toBe(false);
-        });
-    });
-
     describe('modifier functions', function () {
         describe('with', function () {
             var foo, bar;
@@ -112,34 +102,6 @@ describe('cloak.js suite', function () {
         });
 
         describe('when', function () {
-            it('should allow the next cloakWith call to be applied when the condition passed is true', function () {
-                function testIfAlertIsNotSupported() {
-                    return true;
-                }
-
-                function logFn() {
-                    console.log('No alerts allowed');
-                }
-
-                cloak(window, 'alert').when(testIfAlertIsNotSupported).cloakWith(logFn);
-                spyOn(console, 'log');
-
-                alert('Hi');
-                expect(console.log).toHaveBeenCalledWith('No alerts allowed');
-            });
-
-            it('should not allow the next with call to be applied when the condition passed is false', function () {
-                function testIfLoggingIsUnpopular() {
-                    return false;
-                }
-
-                var foo = {betterLogger: function () { alert('lol jk'); }};
-                cloak(console, 'log').when(testIfLoggingIsUnpopular).cloakWith(foo.betterLogger);
-                spyOn(console, 'log');
-
-                console.log('yolo');
-                expect(console.log).toHaveBeenCalled();
-            });
 
             it('should be evaluated when the cloaked function is called', function (done) {
                 var testRunAt;
@@ -157,7 +119,36 @@ describe('cloak.js suite', function () {
                 }, 1000);
             });
 
-            it('should throw an error when it is not passed a function', function () {
+            describe('static booleans', function(){
+               it('should accept a boolean value', function(){
+                   expect(function(){
+                       cloak(console, 'log').when(false);
+                   }).not.toThrow();
+               });
+
+                it('should not allow the next with call to be applied when the condition passed is false', function () {
+                    var foo = {betterLogger: function () { alert('lol jk'); }};
+                    cloak(console, 'log').when(false).cloakWith(foo.betterLogger);
+                    spyOn(console, 'log');
+
+                    console.log('yolo');
+                    expect(console.log).toHaveBeenCalled();
+                });
+
+                it('should allow the next cloakWith call to be applied when the condition passed is true', function () {
+                    function logFn() {
+                        console.log('No alerts allowed');
+                    }
+
+                    cloak(window, 'alert').when(true).cloakWith(logFn);
+                    spyOn(console, 'log');
+
+                    alert('Hi');
+                    expect(console.log).toHaveBeenCalledWith('No alerts allowed');
+                });
+            });
+
+            it('should throw an error when it is not passed a function or boolean', function () {
                 expect(function () {
                     cloak(console, 'log').when(5);
                 }).toThrow();
@@ -172,7 +163,7 @@ describe('cloak.js suite', function () {
                     myLogEndpoint = val;
                 }
 
-                cloak(console, 'log').when(cloak.FALSE).when(cloak.TRUE)
+                cloak(console, 'log').when(false).when(true)
                     .cloakWith(otherLog);
                 console.log('test');
                 expect(myLogEndpoint).toBe('test');
@@ -189,8 +180,8 @@ describe('cloak.js suite', function () {
                     log2 = val;
                 }
 
-                cloak(console, 'log').when(cloak.TRUE).cloakWith(otherLog1)
-                    .when(cloak.TRUE).cloakWith(otherLog2);
+                cloak(console, 'log').when(true).cloakWith(otherLog1)
+                    .when(true).cloakWith(otherLog2);
                 console.log('test');
                 expect(log1).toBe('test');
                 expect(log2).toBe('test');
@@ -225,8 +216,8 @@ describe('cloak.js suite', function () {
                     preaction2Flag = true;
                 }
 
-                cloak(console, 'log').when(cloak.FALSE).before(preactions1).cloakWith(nop)
-                                     .when(cloak.TRUE).before(preactions2).cloakWith(nop);
+                cloak(console, 'log').when(false).before(preactions1).cloakWith(nop)
+                                     .when(true).before(preactions2).cloakWith(nop);
                 console.log('hello');
                 expect(preaction1Flag).toBeUndefined();
                 expect(preaction2Flag).toBe(true);
@@ -278,7 +269,7 @@ describe('cloak.js suite', function () {
             });
         });
 
-        describe('andCallOriginal', function () {
+        describe('callOriginal', function () {
             it('should call the original function when the previous "when" condition is satisfied', function () {
 
             });
@@ -286,6 +277,12 @@ describe('cloak.js suite', function () {
             it('should call the original function when there is no previous "when" condition', function () {
 
             });
+        });
+
+        describe('withContext', function(){
+           it('should provide context for the wrapped functions', function(){
+
+           });
         });
     });
 
