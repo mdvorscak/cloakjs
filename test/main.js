@@ -312,13 +312,6 @@ describe('cloak.js suite', function () {
                 expect(bar).toBe(5);
                 expect(baz).toBe(5);
             });
-            //TODO: Should multiple callOriginal (and to the same function using cloakWith) be allowed?
-        });
-
-        describe('withContext', function(){
-           it('should provide context for the wrapped functions', function(){
-
-           });
         });
     });
 
