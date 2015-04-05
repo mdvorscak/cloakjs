@@ -82,11 +82,6 @@ describe('cloak.js suite', function () {
                 expect(console.log).toHaveBeenCalledWith('I have been switched!');
             });
 
-            //TODO:Should it?
-            xit('should be passed the original function', function () {
-
-            });
-
             it('should be passed the original arguments', function () {
                 cloak(foo, 'setBar').cloakWith(otherObj.otherFunction);
                 foo.setBar(5);
@@ -110,7 +105,7 @@ describe('cloak.js suite', function () {
                     testRunAt = Date.now();
                 }
 
-                cloak(console, 'log').when(deferredTest).cloakWith(window.alert);
+                cloak(console, 'log').when(deferredTest).cloakWith(nop);
                 var timeBeforeTheTest = Date.now();
                 setTimeout(function () {
                     console.log('deference test');
