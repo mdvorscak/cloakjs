@@ -116,7 +116,7 @@ describe('cloak.js suite', function () {
                     console.log('deference test');
                     expect(testRunAt).toBeGreaterThan(timeBeforeTheTest);
                     done();
-                }, 1000);
+                }, 1);
             });
 
             describe('static booleans', function(){
@@ -269,14 +269,50 @@ describe('cloak.js suite', function () {
             });
         });
 
-        describe('callOriginal', function () {
-            it('should call the original function when the previous "when" condition is satisfied', function () {
+        describe('fluent no-op chains', function(){
+            describe('and', function(){
+               it('should chain together two functions with no effect', function(){
+                   expect(function(){
+                       cloak(window, 'alert').cloakWith(console.log).and.when(false).cloakWith(nop);
+                   });
+               });
+            });
+        });
 
+        describe('callOriginal', function () {
+            var foo, bar, baz;
+            beforeEach(function(){
+                foo = {
+                    setBar: function(val) {
+                        bar = val;
+                    },
+                    setBaz: function(val){
+                        baz = val;
+                    }
+                };
+            });
+
+            it('should not call the original when the previous "when" condition is not satisfied but another "when" condition is', function(){
+                cloak(foo, 'setBar').when(false).cloakWith(foo.setBaz).and.callOriginal();
+                foo.setBar(5);
+                expect(bar).toBeUndefined();
+                expect(baz).toBeUndefined();
+            });
+
+            it('should call the original function when the previous "when" condition is satisfied', function () {
+                cloak(foo, 'setBar').when(true).cloakWith(foo.setBaz).and.callOriginal();
+                foo.setBar(5);
+                expect(bar).toBe(5);
+                expect(baz).toBe(5);
             });
 
             it('should call the original function when there is no previous "when" condition', function () {
-
+                cloak(foo, 'setBar').cloakWith(foo.setBaz).and.callOriginal();
+                foo.setBar(5);
+                expect(bar).toBe(5);
+                expect(baz).toBe(5);
             });
+            //TODO: Should multiple callOriginal (and to the same function using cloakWith) be allowed?
         });
 
         describe('withContext', function(){

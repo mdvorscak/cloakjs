@@ -2,13 +2,6 @@
  * Created by Mike Dvorscak on 3/23/15.
  */
 
-//var myCloak = cloak(window, 'alert').when(alertIsNotSupported).cloakWith(popupFn)
-//    .when(logShouldBeUsed).cloakWith(logFn)
-//    .before(runPreActions)
-//    .after(runPostActions)
-//    .andCallOriginal();
-// later that day...
-//myCloak.uncloak()
 (function (exportName) {
     'use strict';
 
@@ -51,7 +44,7 @@
             var currentCase, currentCondition;
             for (var i = 0, len = cases.length; i < len; i++) {
                 currentCase = cases[i];
-                currentCondition= currentCase.condition;
+                currentCondition = currentCase.condition;
                 if ((typeof currentCondition === 'function' && currentCondition()) || currentCondition) {
                     currentCase.replacementFn.apply(context, args);
                 }
@@ -73,7 +66,7 @@
         //Returns true if the case was added, false otherwise
         //wrapper for adding to cases, so additional logic can easily be added
         function addCase(opts, caseObj) {
-            if(caseObj.condition){
+            if (caseObj.condition) {
                 //Normally push, but if for cases like 'before' unshift is used
                 var addFn = opts.atStart ? 'unshift' : 'push';
                 Array.prototype[addFn].call(opts.caseArr, caseObj);
@@ -83,10 +76,8 @@
 
         self.cloakWith = function cloakWith(fn) {
             parameterCheck({param: fn, types: ['function'], argName: 'fn'});
-            var caseAdded = addCase({caseArr: cases},
-                                    {condition: state.lastWhenCondition, replacementFn: fn});
-            //Only wrap for real when we're given something valid to wrap with
-            if(caseAdded && !wrappedMethod){
+            addCase({caseArr: cases}, {condition: state.lastWhenCondition, replacementFn: fn});
+            if (!wrappedMethod) {
                 replaceMethodWithWrapper();
             }
             return self;
@@ -117,6 +108,15 @@
                     {condition: state.lastWhenCondition, replacementFn: fn});
             return self;
         };
+
+        self.callOriginal = function callOriginal() {
+            addCase({caseArr: cases},
+                    {condition: state.lastWhenCondition, replacementFn: wrappedMethod});
+            return self;
+        };
+
+        //fluent attributes, just chainable no-ops
+        self.and = self;
 
         return self;
     }
