@@ -28,3 +28,5 @@ gulp.task('scripts', function () {
               }))
         .pipe(gulp.dest(''));
 });
+
+gulp.task('default', ['test', 'scripts']);
