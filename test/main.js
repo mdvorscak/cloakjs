@@ -6,7 +6,7 @@ describe('cloak.js suite', function () {
     var nop = function(){};
     describe('cloak', function () {
 
-        it('should wrap immediately', function () {
+        it('should call the original function if it was never cloaked', function () {
             var bar;
             var foo = {
                 setBar: function (value) {
@@ -16,7 +16,7 @@ describe('cloak.js suite', function () {
 
             cloak(foo, 'setBar');
             foo.setBar(5);
-            expect(bar).toBeUndefined();
+            expect(bar).toBe(5);
         });
 
         it('should throw an error when the property provided is not a function', function () {
@@ -74,6 +74,13 @@ describe('cloak.js suite', function () {
 
                 spyOn(console, 'log');
             });
+
+            it('should prevent the original function from being called', function(){
+                cloak(foo, 'setBar').cloakWith(otherObj.otherFunction);
+                foo.setBar(5);
+                expect(bar).toBeUndefined();
+            });
+
             it('should replace the currently cloaked function with the function provided', function () {
                 cloak(foo, 'setBar').cloakWith(otherObj.otherFunction);
                 foo.setBar(5);
@@ -194,10 +201,10 @@ describe('cloak.js suite', function () {
                 };
             });
 
-            it('should cloak the function immediately', function(){
+            it('should call the original function and the before function if there was no cloakWith call', function(){
                 cloak(foo, 'setBar').before(foo.setBaz);
                 foo.setBar(5);
-                expect(bar).toBeUndefined();
+                expect(bar).toBe(5);
                 expect(baz).toBe(5);
             });
 

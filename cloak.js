@@ -57,6 +57,9 @@
             //bind the original methods context
             wrappedMethod = wrappedMethod.bind(this);
             var args = Array.prototype.slice.call(arguments);
+            if(!state.cloaked){
+                wrappedMethod.apply(this, args);
+            }
             runCases(cases, this, args);
             runCases(afterCases, this, args);
         };
@@ -74,6 +77,8 @@
 
         self.cloakWith = function cloakWith(fn) {
             parameterCheck({param: fn, types: ['function'], argName: 'fn'});
+            //The cloaked state just indicates that the original function will no longer be called
+            state.cloaked = true;
             addCase({caseArr: cases}, {condition: state.lastWhenCondition, replacementFn: fn});
             return self;
         };
