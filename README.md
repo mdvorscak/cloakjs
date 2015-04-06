@@ -1,6 +1,8 @@
 # cloak.js
 **A small AOP/Proxy/Wrapper library with a fluent interface**
 
+[![Build Status][travis-image]][travis-url]
+
 # Basic examples
 ```js
 function myAlertFn(msg){
@@ -25,3 +27,6 @@ To learn more checkout the [documentation page] (docs/README.md)
 
 # License
 MIT - [view the full license here] (LICENSE)
+
+[travis-url]: https://travis-ci.org/mdvorscak/cloakjs
+[travis-image]: https://travis-ci.org/mdvorscak/cloakjs.svg?branch=master
