@@ -1,7 +1,7 @@
 # cloak.js
 **A small AOP/Proxy/Wrapper library with a fluent interface**
 
-[![Build Status][travis-image]][travis-url]
+[![Build Status][travis-image]][travis-url] [![Coveralls Status][coveralls-image]][coveralls-url]
 
 # Basic examples
 ```js
@@ -30,3 +30,6 @@ MIT - [view the full license here] (LICENSE)
 
 [travis-url]: https://travis-ci.org/mdvorscak/cloakjs
 [travis-image]: https://travis-ci.org/mdvorscak/cloakjs.svg?branch=master
+
+[coveralls-url]: https://coveralls.io/r/mdvorscak/cloakjs?branch=master
+[coveralls-image]: https://coveralls.io/repos/mdvorscak/cloakjs/badge.svg?branch=master
