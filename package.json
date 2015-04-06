@@ -1,10 +1,14 @@
 {
   "name": "cloak.js",
   "version": "0.0.1",
-  "description": "A small AOP library with a fluent interface",
+  "description": "A small AOP/Proxy/Wrapper library with a fluent interface",
   "main": "cloak.js",
   "directories": {
     "test": "test"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/mdvorscak/cloakjs"
   },
   "dependencies": {},
   "devDependencies": {
@@ -25,8 +29,15 @@
   "keywords": [
     "AOP",
     "wrapper",
-    "Cloak"
+    "Cloak",
+    "Proxy",
+    "fluent"
   ],
   "author": "Mike Dvorscak",
-  "license": "MIT"
+  "license": [
+    {
+      "type": "MIT",
+      "url": "https://raw.githubusercontent.com/mdvorscak/cloakjs/master/LICENSE"
+    }
+  ]
 }
