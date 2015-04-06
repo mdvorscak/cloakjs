@@ -6,19 +6,17 @@ describe('cloak.js suite', function () {
     var nop = function(){};
     describe('cloak', function () {
 
-        it('should do nothing when called alone', function () {
+        it('should wrap immediately', function () {
             var bar;
             var foo = {
                 setBar: function (value) {
                     bar = value;
                 }
             };
-            spyOn(foo, 'setBar').and.callThrough();
 
             cloak(foo, 'setBar');
             foo.setBar(5);
-            expect(foo.setBar).toHaveBeenCalledWith(5);
-            expect(bar).toBe(5);
+            expect(bar).toBeUndefined();
         });
 
         it('should throw an error when the property provided is not a function', function () {
@@ -196,6 +194,13 @@ describe('cloak.js suite', function () {
                 };
             });
 
+            it('should cloak the function immediately', function(){
+                cloak(foo, 'setBar').before(foo.setBaz);
+                foo.setBar(5);
+                expect(bar).toBeUndefined();
+                expect(baz).toBe(5);
+            });
+
             it('should throw an error when it is not given a function', function () {
                 expect(function () {
                     cloak(console, 'log').before(5);
@@ -239,6 +244,18 @@ describe('cloak.js suite', function () {
         });
 
         describe('after', function () {
+            it('should cloak the function immediately', function(){
+                var bar;
+                var foo = {
+                    setBar: function(val){
+                        bar = val;
+                    }
+                };
+                cloak(console, 'log').after(foo.setBar);
+                console.log(5);
+                expect(bar).toBe(5);
+            });
+
             it('should throw an error when it is not given a function', function () {
                 expect(function () {
                     cloak(console, 'log').after(5);
@@ -277,6 +294,8 @@ describe('cloak.js suite', function () {
         describe('callOriginal', function () {
             var foo, bar, baz;
             beforeEach(function(){
+                bar = 0;
+                baz = 0;
                 foo = {
                     setBar: function(val) {
                         bar = val;
@@ -290,8 +309,14 @@ describe('cloak.js suite', function () {
             it('should not call the original when the previous "when" condition is not satisfied but another "when" condition is', function(){
                 cloak(foo, 'setBar').when(false).cloakWith(foo.setBaz).and.callOriginal();
                 foo.setBar(5);
-                expect(bar).toBeUndefined();
-                expect(baz).toBeUndefined();
+                expect(bar).toBe(0);
+                expect(baz).toBe(0);
+            });
+
+            it('should cloak the function immediately', function(){
+                cloak(foo, 'setBar').callOriginal();
+                foo.setBar(5);
+                expect(bar).toBe(5);
             });
 
             it('should call the original function when the previous "when" condition is satisfied', function () {

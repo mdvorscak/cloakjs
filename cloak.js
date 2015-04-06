@@ -51,17 +51,15 @@
             }
         }
 
-        function replaceMethodWithWrapper() {
-            //Store the original method for later
-            wrappedMethod = object[method];
-            object[method] = function cloakWrapper() {
-                //bind the original methods context
-                wrappedMethod = wrappedMethod.bind(this);
-                var args = Array.prototype.slice.call(arguments);
-                runCases(cases, this, args);
-                runCases(afterCases, this, args);
-            };
-        }
+        //Store the original method for later
+        wrappedMethod = object[method];
+        object[method] = function cloakWrapper() {
+            //bind the original methods context
+            wrappedMethod = wrappedMethod.bind(this);
+            var args = Array.prototype.slice.call(arguments);
+            runCases(cases, this, args);
+            runCases(afterCases, this, args);
+        };
 
         //Returns true if the case was added, false otherwise
         //wrapper for adding to cases, so additional logic can easily be added
@@ -77,9 +75,6 @@
         self.cloakWith = function cloakWith(fn) {
             parameterCheck({param: fn, types: ['function'], argName: 'fn'});
             addCase({caseArr: cases}, {condition: state.lastWhenCondition, replacementFn: fn});
-            if (!wrappedMethod) {
-                replaceMethodWithWrapper();
-            }
             return self;
         };
 
