@@ -45,7 +45,8 @@
             for (var i = 0, len = cases.length; i < len; i++) {
                 currentCase = cases[i];
                 currentCondition = currentCase.condition;
-                if ((typeof currentCondition === 'function' && currentCondition()) || currentCondition) {
+                if ((typeof currentCondition === 'function' && currentCondition.apply(context, args)) ||
+                    (typeof currentCondition === 'boolean' && currentCondition)) {
                     currentCase.replacementFn.apply(context, args);
                 }
             }
@@ -115,6 +116,8 @@
         self.callOriginal = function callOriginal() {
             addCase({caseArr: cases},
                     {condition: state.lastWhenCondition, replacementFn: wrappedMethod});
+            //prevents double calls to the original when this is used without cloakWith
+            state.cloaked = true;
             return self;
         };
 

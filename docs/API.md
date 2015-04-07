@@ -24,8 +24,22 @@ In the previous example `foo.baz` would be called first then `foo.too`
 Adds a conditional check to each future [cloaking function](Glossary.md#cloaking-function). 
 The `condition` parameter can either be a boolean or a function.
 If it is a function, it will be evaluated when the cloaked function is called (each time). 
-This is useful if you need to check certain things about the state before calling the cloaking function.  
-Multiple when conditions together, the rule is always: 
+This is useful if you need to check certain things about the state before calling the cloaking function.
+You can access the parameters of the cloaked function in your when callback. 
+This callback is also run in the same context as the cloaked function. See example:
+
+```js
+function whenTest(arg1, arg2){
+    //here this refers to console (the object that is being cloaked)
+    this.warn('hi'); // the console will warn 'hi'
+    return arg1 > arg2;
+}
+cloak(console, 'log').when(whenTest).callOriginal();
+console.log(1, 2); //nothing will be logged
+console.log(2, 1); //2 1 will be logged
+```
+
+If multiple when conditions are used together, the rule is always: 
 **the cloaking function will be run ONLY if the previous when condition is true**
 
 ### cloak.before(fn)

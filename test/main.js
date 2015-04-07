@@ -170,6 +170,52 @@ describe('cloak.js suite', function () {
                     cloak(console, 'log').when(5);
                 }).toThrow();
             });
+
+            it('should be passed the cloaked functions arguments, when the condition is a function', function(){
+                var argOne, argTwo;
+                function whenTest(arg1, arg2){
+                    argOne = arg1;
+                    argTwo = arg2;
+                }
+                cloak(console, 'log').when(whenTest).cloakWith(nop);
+                console.log('test', 1);
+                expect(argOne).toBe('test');
+                expect(argTwo).toBe(1);
+            });
+
+            it('should call the next cloaking function when the conditional function returns true', function(){
+                var bar, baz;
+                var foo = {
+                    setBarAndBaz: function(barVal, bazVal){
+                        bar = barVal;
+                        baz = bazVal;
+                    }
+                };
+                function whenTest(arg1, arg2){
+                    return arg1 > arg2;
+                }
+                cloak(foo, 'setBarAndBaz').when(whenTest).callOriginal();
+                foo.setBarAndBaz(2, 1);
+                expect(bar).toBe(2);
+                expect(baz).toBe(1);
+            });
+
+            it('should not call the next cloaking function when the conditional function returns false', function(){
+                var bar, baz;
+                var foo = {
+                    setBarAndBaz: function(barVal, bazVal){
+                        bar = barVal;
+                        baz = bazVal;
+                    }
+                };
+                function whenTest(arg1, arg2){
+                    return arg1 > arg2;
+                }
+                cloak(foo, 'setBarAndBaz').when(whenTest).callOriginal();
+                foo.setBarAndBaz(1, 2);
+                expect(bar).toBeUndefined();
+                expect(baz).toBeUndefined();
+            });
         });
 
         describe('chaining', function () {
