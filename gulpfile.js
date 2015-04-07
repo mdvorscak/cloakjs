@@ -29,4 +29,8 @@ gulp.task('scripts', function () {
         .pipe(gulp.dest(''));
 });
 
+gulp.task('dev', ['tdd'], function(){
+    gulp.watch('cloak.js', ['scripts']);
+});
+
 gulp.task('default', ['test', 'scripts']);
