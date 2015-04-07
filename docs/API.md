@@ -63,3 +63,21 @@ Example usage:
 ```js
 cloak(foo, 'bar').when(theTimeIsRight).cloakWith(startFunctionTimer).and.cloakWith(myNewBar)
 ```
+
+### Accessing the original function
+Inside of a cloaking function you may want to use the original function. 
+The original function can be accessed as the final parameter of cloaking function. See example:
+
+```js
+var bar;
+var foo = {
+    setBar: function(val){
+        bar = val;
+    }
+};
+
+cloak(foo, 'setBar').cloakWith(function(val, originalFn){
+    originalFn(val + 5);
+});
+foo.setBar(5); // bar is now 10
+```

@@ -54,6 +54,23 @@ describe('cloak.js suite', function () {
         });
     });
 
+    describe('cloaking functions', function(){
+        it('should receive the original function as a final parameter', function(){
+            var bar;
+            var foo = {
+                setBar: function(val){
+                    bar = val;
+                }
+            };
+
+            cloak(foo, 'setBar').cloakWith(function(val, originalFn){
+                originalFn(val + 5);
+            });
+            foo.setBar(5);
+            expect(bar).toBe(10);
+        });
+    });
+
     describe('modifier functions', function () {
         describe('with', function () {
             var foo, bar;

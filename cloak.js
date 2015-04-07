@@ -60,8 +60,11 @@
             if(!state.cloaked){
                 wrappedMethod.apply(this, args);
             }
-            runCases(cases, this, args);
-            runCases(afterCases, this, args);
+            //concat instead of push because the wrapped method should only get the original args
+            //and not a reference to itself
+            var argsWithOriginalFn = args.concat(wrappedMethod);
+            runCases(cases, this, argsWithOriginalFn);
+            runCases(afterCases, this, argsWithOriginalFn);
         };
 
         //Returns true if the case was added, false otherwise
