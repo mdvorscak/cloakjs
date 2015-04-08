@@ -21,7 +21,7 @@ module.exports = function (config) {
 
 
         // list of files to exclude
-        exclude: [],
+        exclude: ['test/*-node.js'],
 
 
         // preprocess matching files before serving them to the browser

@@ -154,14 +154,14 @@ describe('cloak.js suite', function () {
 
                 it('should allow the next cloakWith call to be applied when the condition passed is true', function () {
                     function logFn() {
-                        console.log('No alerts allowed');
+                        console.log('No warnings allowed');
                     }
 
-                    cloak(window, 'alert').when(true).cloakWith(logFn);
+                    cloak(console, 'warn').when(true).cloakWith(logFn);
                     spyOn(console, 'log');
 
-                    alert('Hi');
-                    expect(console.log).toHaveBeenCalledWith('No alerts allowed');
+                    console.warn('Hi');
+                    expect(console.log).toHaveBeenCalledWith('No warnings allowed');
                 });
             });
 
@@ -355,7 +355,7 @@ describe('cloak.js suite', function () {
             describe('and', function(){
                it('should chain together two functions with no effect', function(){
                    expect(function(){
-                       cloak(window, 'alert').cloakWith(console.log).and.when(false).cloakWith(nop);
+                       cloak(console, 'warn').cloakWith(console.log).and.when(false).cloakWith(nop);
                    });
                });
             });
