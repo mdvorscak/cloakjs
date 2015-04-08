@@ -1,0 +1,45 @@
+{
+  "name": "cloakjs",
+  "main": "cloak.js",
+  "version": "1.0.0",
+  "moduleType": ["globals", "node"],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mdvorscak/cloakjs"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.2",
+    "gulp": "^3.8.11",
+    "gulp-header": "^1.2.2",
+    "gulp-istanbul": "^0.8.1",
+    "gulp-jasmine": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.1.0",
+    "jasmine-core": "^2.2.0",
+    "karma": "^0.12.31",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-coverage": "^0.2.7",
+    "karma-jasmine": "^0.3.5",
+    "lcov-result-merger": "^1.0.2"
+  },
+  "authors": [
+    {"name": "Mike Dvorscak", "email": "mike.dvorscak@gmail.com"}
+  ],
+  "description": "A small AOP/Proxy/Wrapper library with a fluent interface",
+  "keywords": [
+    "AOP",
+    "wrapper",
+    "Cloak",
+    "Proxy",
+    "fluent"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "coverage"
+  ]
+}

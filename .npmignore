@@ -4,3 +4,4 @@ node_modules/
 .travis.yml
 cloak.min.js
 karma.conf.js
+bower.json
