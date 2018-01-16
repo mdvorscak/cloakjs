@@ -29,10 +29,10 @@ or
     bower install cloakjs
 
 # Documentation
-To learn more checkout the [documentation page] (docs/README.md)
+To learn more checkout the [documentation page](docs/README.md)
 
 # License
-MIT - [view the full license here] (LICENSE)
+MIT - [view the full license here](LICENSE)
 
 [travis-url]: https://travis-ci.org/mdvorscak/cloakjs
 [travis-image]: https://travis-ci.org/mdvorscak/cloakjs.svg?branch=master
