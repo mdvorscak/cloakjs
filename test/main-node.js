@@ -257,6 +257,14 @@ describe('cloak.js suite', function () {
                 expect(log1).toBe('test');
                 expect(log2).toBe('test');
             });
+
+            it('should use only the last return value in the chain', function(){
+                const foo = {
+                  retBar: () => 5
+                };
+                cloak(foo, 'retBar').cloakWith(() => 7).cloakWith(() => 42);
+                expect(foo.retBar()).toBe(42);
+            });
         });
 
         describe('before', function () {
@@ -356,6 +364,14 @@ describe('cloak.js suite', function () {
                 cloak(console, 'log').after(calculateUltimateAnswer).cloakWith(setBarTo5).cloakWith(setBazTo37);
                 console.log('Sup?');
                 expect(ultimateAnswer).toBe(42);
+            });
+
+            it('should be used as the return value', function(){
+              const foo = {
+                retBar: () => 5
+              };
+              cloak(foo, 'retBar').after(() => 'final answer').cloakWith(() => 7).cloakWith(() => 42);
+              expect(foo.retBar()).toBe('final answer');
             });
         });
 
