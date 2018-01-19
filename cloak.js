@@ -41,15 +41,16 @@
         state.lastWhenCondition = true;
 
         function runCases(cases, context, args) {
-            var currentCase, currentCondition;
+            var currentCase, currentCondition, ret;
             for (var i = 0, len = cases.length; i < len; i++) {
                 currentCase = cases[i];
                 currentCondition = currentCase.condition;
                 if ((typeof currentCondition === 'function' && currentCondition.apply(context, args)) ||
                     (typeof currentCondition === 'boolean' && currentCondition)) {
-                    currentCase.replacementFn.apply(context, args);
+                    ret = currentCase.replacementFn.apply(context, args);
                 }
             }
+            return ret;
         }
 
         //Store the original method for later
@@ -64,8 +65,9 @@
             //concat instead of push because the wrapped method should only get the original args
             //and not a reference to itself
             var argsWithOriginalFn = args.concat(wrappedMethod);
-            runCases(cases, this, argsWithOriginalFn);
-            runCases(afterCases, this, argsWithOriginalFn);
+            var ret = runCases(cases, this, argsWithOriginalFn);
+            ret = runCases(afterCases, this, argsWithOriginalFn) || ret;
+            return ret;
         };
 
         //Returns true if the case was added, false otherwise
