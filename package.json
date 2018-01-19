@@ -1,6 +1,6 @@
 {
   "name": "cloakjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A small AOP/Proxy/Wrapper library with a fluent interface",
   "main": "cloak.js",
   "directories": {
