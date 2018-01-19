@@ -1,4 +1,4 @@
-/**
+var cloak = require('../cloak.js');/**
  * Created by Mike Dvorscak on 3/23/15.
  */
 
