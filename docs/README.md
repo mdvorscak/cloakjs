@@ -1,7 +1,7 @@
 # cloak documentation
 
-* [Glossary] (Glossary.md)
-* [API] (API.md)
+* [Glossary](Glossary.md)
+* [API](API.md)
 
 ## FAQs/Pitfalls
 
